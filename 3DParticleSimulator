@@ -1,0 +1,386 @@
+classdef ParticleApp2 < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure        matlab.ui.Figure
+        TextArea_3      matlab.ui.control.TextArea
+        TextArea        matlab.ui.control.TextArea
+        ClearButton     matlab.ui.control.Button
+        RunSwitch       matlab.ui.control.Switch
+        RunSwitchLabel  matlab.ui.control.Label
+        vzSlider        matlab.ui.control.Slider
+        vzSliderLabel   matlab.ui.control.Label
+        vySlider        matlab.ui.control.Slider
+        vySliderLabel   matlab.ui.control.Label
+        vxSlider        matlab.ui.control.Slider
+        vxSliderLabel   matlab.ui.control.Label
+        BzSlider        matlab.ui.control.Slider
+        BzSliderLabel   matlab.ui.control.Label
+        BySlider        matlab.ui.control.Slider
+        BySliderLabel   matlab.ui.control.Label
+        BxSlider        matlab.ui.control.Slider
+        BxSliderLabel   matlab.ui.control.Label
+        EzSlider        matlab.ui.control.Slider
+        EzSliderLabel   matlab.ui.control.Label
+        EySlider        matlab.ui.control.Slider
+        EySliderLabel   matlab.ui.control.Label
+        mSlider         matlab.ui.control.Slider
+        mSliderLabel    matlab.ui.control.Label
+        ExSlider        matlab.ui.control.Slider
+        ExSliderLabel   matlab.ui.control.Label
+        qSlider         matlab.ui.control.Slider
+        qSliderLabel    matlab.ui.control.Label
+        UIAxes          matlab.ui.control.UIAxes
+    end
+
+    % Callbacks that handle component events
+    methods (Access = private)
+
+        % Value changed function: RunSwitch
+        function RunSwitchValueChanged(app, event)
+            value = app.RunSwitch.Value;
+            
+            %set initial position to 0
+            x = 0; 
+            y = 0;
+            z = 0;
+            
+            %set variables equal to slider input
+            q = app.qSlider.Value;
+            m = app.mSlider.Value;
+            
+            Ex = app.ExSlider.Value;
+            Ey = app.EySlider.Value;
+            Ez = app.EzSlider.Value;
+            
+            Bx = app.BxSlider.Value;
+            By = app.BySlider.Value;
+            Bz = app.BzSlider.Value;
+            
+            vx = app.vxSlider.Value;
+            vy = app.vySlider.Value;
+            vz = app.vzSlider.Value;
+            
+            %change in time
+            dt = 0.001;
+            
+            %keeps points plotting on the same graph
+            hold(app.UIAxes,'on')
+            
+            %initial index for while loop
+            i = 1;
+            
+            %runs the program while switch is set to "ON"
+            while strcmp(app.RunSwitch.Value,'On')
+                %calculates the acceleration based off of previous i's
+                %velocity
+                ax = (q/m)*(Ex + vy*Bz - vz*By);
+                ay = (q/m)*(Ey + vz*Bx - vx*Bz);
+                az = (q/m)*(Ez + vx*By - vy*Bx);
+                
+                %calculates this i's velocity from acceleration
+                vx = vx + ax*dt;
+                vy = vy + ay*dt;
+                vz = vz + az*dt;
+                
+                %calculates position from velocity
+                x = x + vx*dt;
+                y = y + vy*dt;
+                z = z + vz*dt;
+                    
+                    %when i = 100, it stops running
+                    if mod(i,100) == 0;
+                        %plots the particle using x,y,z for that location
+                        plot3(app.UIAxes,x,y,z,'r*')
+                        axis(app.UIAxes,'equal')
+                        %sets view angle to see all three dimensions at
+                        %same time
+                        view(app.UIAxes,45,25)
+                    end
+                %pause so it can plot everything
+                pause(0.001)
+                %increases iteration count by 1 for every loop until 100
+                i = i+1;
+            end
+        end
+
+        % Button pushed function: ClearButton
+        function ClearButtonPushed(app, event)
+            %clears the graph when clear button pressed
+            cla(app.UIAxes)
+        end
+
+        % Value changed function: vxSlider
+        function vxSliderValueChanged(app, event)
+            value = app.vxSlider.Value;
+            
+        end
+
+        % Value changed function: vySlider
+        function vySliderValueChanged(app, event)
+            value = app.vySlider.Value;
+            
+        end
+
+        % Value changed function: vzSlider
+        function vzSliderValueChanged(app, event)
+            value = app.vzSlider.Value;
+            
+        end
+
+        % Value changed function: BxSlider
+        function BxSliderValueChanged(app, event)
+            value = app.BxSlider.Value;
+            
+        end
+
+        % Value changed function: BySlider
+        function BySliderValueChanged(app, event)
+            value = app.BySlider.Value;
+            
+        end
+
+        % Value changed function: BzSlider
+        function BzSliderValueChanged(app, event)
+            value = app.BzSlider.Value;
+            
+        end
+
+        % Value changed function: ExSlider
+        function ExSliderValueChanged(app, event)
+            value = app.ExSlider.Value;
+            
+        end
+
+        % Value changed function: EySlider
+        function EySliderValueChanged(app, event)
+            value = app.EySlider.Value;
+            
+        end
+
+        % Value changed function: EzSlider
+        function EzSliderValueChanged(app, event)
+            value = app.EzSlider.Value;
+            
+        end
+
+        % Value changed function: qSlider
+        function qSliderValueChanged(app, event)
+            value = app.qSlider.Value;
+            
+        end
+
+        % Value changed function: mSlider
+        function mSliderValueChanged(app, event)
+            value = app.mSlider.Value;
+            
+        end
+    end
+
+    % Component initialization
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Create UIFigure and hide until all components are created
+            app.UIFigure = uifigure('Visible', 'off');
+            app.UIFigure.Position = [100 100 928 651];
+            app.UIFigure.Name = 'MATLAB App';
+
+            % Create UIAxes
+            app.UIAxes = uiaxes(app.UIFigure);
+            app.UIAxes.XTick = [];
+            app.UIAxes.YTick = [];
+            app.UIAxes.ZTick = [];
+            app.UIAxes.Position = [153 196 739 405];
+
+            % Create qSliderLabel
+            app.qSliderLabel = uilabel(app.UIFigure);
+            app.qSliderLabel.HorizontalAlignment = 'right';
+            app.qSliderLabel.Position = [696 165 25 22];
+            app.qSliderLabel.Text = 'q';
+
+            % Create qSlider
+            app.qSlider = uislider(app.UIFigure);
+            app.qSlider.Limits = [0 3];
+            app.qSlider.ValueChangedFcn = createCallbackFcn(app, @qSliderValueChanged, true);
+            app.qSlider.Position = [742 174 150 3];
+
+            % Create ExSliderLabel
+            app.ExSliderLabel = uilabel(app.UIFigure);
+            app.ExSliderLabel.HorizontalAlignment = 'right';
+            app.ExSliderLabel.Position = [43 174 25 22];
+            app.ExSliderLabel.Text = 'Ex';
+
+            % Create ExSlider
+            app.ExSlider = uislider(app.UIFigure);
+            app.ExSlider.Limits = [0 10];
+            app.ExSlider.ValueChangedFcn = createCallbackFcn(app, @ExSliderValueChanged, true);
+            app.ExSlider.Position = [89 183 150 3];
+
+            % Create mSliderLabel
+            app.mSliderLabel = uilabel(app.UIFigure);
+            app.mSliderLabel.HorizontalAlignment = 'right';
+            app.mSliderLabel.Position = [696 116 25 22];
+            app.mSliderLabel.Text = 'm';
+
+            % Create mSlider
+            app.mSlider = uislider(app.UIFigure);
+            app.mSlider.Limits = [0 3];
+            app.mSlider.ValueChangedFcn = createCallbackFcn(app, @mSliderValueChanged, true);
+            app.mSlider.Position = [742 125 150 3];
+
+            % Create EySliderLabel
+            app.EySliderLabel = uilabel(app.UIFigure);
+            app.EySliderLabel.HorizontalAlignment = 'right';
+            app.EySliderLabel.Position = [43 123 25 22];
+            app.EySliderLabel.Text = 'Ey';
+
+            % Create EySlider
+            app.EySlider = uislider(app.UIFigure);
+            app.EySlider.Limits = [0 10];
+            app.EySlider.ValueChangedFcn = createCallbackFcn(app, @EySliderValueChanged, true);
+            app.EySlider.Position = [89 132 150 3];
+
+            % Create EzSliderLabel
+            app.EzSliderLabel = uilabel(app.UIFigure);
+            app.EzSliderLabel.HorizontalAlignment = 'right';
+            app.EzSliderLabel.Position = [43 73 25 22];
+            app.EzSliderLabel.Text = 'Ez';
+
+            % Create EzSlider
+            app.EzSlider = uislider(app.UIFigure);
+            app.EzSlider.Limits = [0 10];
+            app.EzSlider.ValueChangedFcn = createCallbackFcn(app, @EzSliderValueChanged, true);
+            app.EzSlider.Position = [89 82 150 3];
+
+            % Create BxSliderLabel
+            app.BxSliderLabel = uilabel(app.UIFigure);
+            app.BxSliderLabel.HorizontalAlignment = 'right';
+            app.BxSliderLabel.Position = [264 175 25 22];
+            app.BxSliderLabel.Text = 'Bx';
+
+            % Create BxSlider
+            app.BxSlider = uislider(app.UIFigure);
+            app.BxSlider.Limits = [0 10];
+            app.BxSlider.ValueChangedFcn = createCallbackFcn(app, @BxSliderValueChanged, true);
+            app.BxSlider.Position = [310 184 150 3];
+
+            % Create BySliderLabel
+            app.BySliderLabel = uilabel(app.UIFigure);
+            app.BySliderLabel.HorizontalAlignment = 'right';
+            app.BySliderLabel.Position = [265 124 25 22];
+            app.BySliderLabel.Text = 'By';
+
+            % Create BySlider
+            app.BySlider = uislider(app.UIFigure);
+            app.BySlider.Limits = [0 10];
+            app.BySlider.ValueChangedFcn = createCallbackFcn(app, @BySliderValueChanged, true);
+            app.BySlider.Position = [311 133 150 3];
+
+            % Create BzSliderLabel
+            app.BzSliderLabel = uilabel(app.UIFigure);
+            app.BzSliderLabel.HorizontalAlignment = 'right';
+            app.BzSliderLabel.Position = [265 73 25 22];
+            app.BzSliderLabel.Text = 'Bz';
+
+            % Create BzSlider
+            app.BzSlider = uislider(app.UIFigure);
+            app.BzSlider.Limits = [0 10];
+            app.BzSlider.ValueChangedFcn = createCallbackFcn(app, @BzSliderValueChanged, true);
+            app.BzSlider.Position = [311 82 150 3];
+
+            % Create vxSliderLabel
+            app.vxSliderLabel = uilabel(app.UIFigure);
+            app.vxSliderLabel.HorizontalAlignment = 'right';
+            app.vxSliderLabel.Position = [493 168 25 22];
+            app.vxSliderLabel.Text = 'vx';
+
+            % Create vxSlider
+            app.vxSlider = uislider(app.UIFigure);
+            app.vxSlider.Limits = [0 10];
+            app.vxSlider.ValueChangedFcn = createCallbackFcn(app, @vxSliderValueChanged, true);
+            app.vxSlider.Position = [539 177 150 3];
+
+            % Create vySliderLabel
+            app.vySliderLabel = uilabel(app.UIFigure);
+            app.vySliderLabel.HorizontalAlignment = 'right';
+            app.vySliderLabel.Position = [494 117 25 22];
+            app.vySliderLabel.Text = 'vy';
+
+            % Create vySlider
+            app.vySlider = uislider(app.UIFigure);
+            app.vySlider.Limits = [0 10];
+            app.vySlider.ValueChangedFcn = createCallbackFcn(app, @vySliderValueChanged, true);
+            app.vySlider.Position = [540 126 150 3];
+
+            % Create vzSliderLabel
+            app.vzSliderLabel = uilabel(app.UIFigure);
+            app.vzSliderLabel.HorizontalAlignment = 'right';
+            app.vzSliderLabel.Position = [494 66 25 22];
+            app.vzSliderLabel.Text = 'vz';
+
+            % Create vzSlider
+            app.vzSlider = uislider(app.UIFigure);
+            app.vzSlider.Limits = [0 10];
+            app.vzSlider.ValueChangedFcn = createCallbackFcn(app, @vzSliderValueChanged, true);
+            app.vzSlider.Position = [540 75 150 3];
+
+            % Create RunSwitchLabel
+            app.RunSwitchLabel = uilabel(app.UIFigure);
+            app.RunSwitchLabel.HorizontalAlignment = 'center';
+            app.RunSwitchLabel.Position = [75 452 28 22];
+            app.RunSwitchLabel.Text = 'Run';
+
+            % Create RunSwitch
+            app.RunSwitch = uiswitch(app.UIFigure, 'slider');
+            app.RunSwitch.ValueChangedFcn = createCallbackFcn(app, @RunSwitchValueChanged, true);
+            app.RunSwitch.Position = [65 489 45 20];
+
+            % Create ClearButton
+            app.ClearButton = uibutton(app.UIFigure, 'push');
+            app.ClearButton.ButtonPushedFcn = createCallbackFcn(app, @ClearButtonPushed, true);
+            app.ClearButton.Position = [39 398 100 22];
+            app.ClearButton.Text = 'Clear';
+
+            % Create TextArea
+            app.TextArea = uitextarea(app.UIFigure);
+            app.TextArea.Position = [735 11 157 77];
+            app.TextArea.Value = {'E: Electric Field (N/C)'; 'B: Magnetic Field (T)'; 'v: Velocity (m/s)'; 'q: Charge (C)'; 'm: Mass (kg)'; ''};
+
+            % Create TextArea_3
+            app.TextArea_3 = uitextarea(app.UIFigure);
+            app.TextArea_3.Position = [11 224 143 149];
+            app.TextArea_3.Value = {'Select the magnitude of each component to model the motion of a particle in a magnetic and electric field! '; ''; '~in three dimensions~'};
+
+            % Show the figure after all components are created
+            app.UIFigure.Visible = 'on';
+        end
+    end
+
+    % App creation and deletion
+    methods (Access = public)
+
+        % Construct app
+        function app = ParticleApp2
+
+            % Create UIFigure and components
+            createComponents(app)
+
+            % Register the app with App Designer
+            registerApp(app, app.UIFigure)
+
+            if nargout == 0
+                clear app
+            end
+        end
+
+        % Code that executes before app deletion
+        function delete(app)
+
+            % Delete UIFigure when app is deleted
+            delete(app.UIFigure)
+        end
+    end
+end
